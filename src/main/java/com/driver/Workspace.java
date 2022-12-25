@@ -26,23 +26,39 @@ public class Workspace extends Gmail{
         // 1. At a particular time, you can be present in at most one meeting
         // 2. If you want to attend a meeting, you must join it at its start time and leave at end time.
         // Example: If a meeting ends at 10:00 am, you cannot attend another meeting starting at 10:00 am
-        int c=0;
-        Meeting temp = calendar.get(0);
-        int n = calendar.size();
-        // System.out.println(calendar.get(0).getEndTime());
-        for(int i=0;i<n-1;i++){
-            LocalTime start =calendar.get(0).getStartTime();
-            LocalTime end = calendar.get(0).getEndTime();
-            for(int j=i+1;j<n;j++){
-                if(
-                        start.compareTo(calendar.get(j).getStartTime()) >0 && start.compareTo(calendar.get(j).getEndTime()) >0 &&end.compareTo(calendar.get(j).getStartTime()) > 0 && end.compareTo(calendar.get(j).getEndTime()) >0
-                                || start.compareTo(calendar.get(j).getStartTime()) <0 && end.compareTo(calendar.get(j).getStartTime()) <0 &&start.compareTo(calendar.get(j).getEndTime()) < 0 && end.compareTo(calendar.get(j).getEndTime()) <0
-                ){
-                    c++;
-                }
-
+        int cnt = 1;
+        ArrayList<pair> list = new ArrayList<>();
+        for(int i=0; i<calendar.size(); i++){
+            Meeting m = calendar.get(i);
+            list.add(new pair(m.getStartTime(), m.getEndTime()));
+        }
+        Collections.sort(list);
+        LocalTime temp = list.get(0).end;
+        for(int i=1; i<list.size(); i++){
+            pair p = list.get(i);
+            if(p.start.compareTo(temp) > 0){
+                cnt++;
+                temp = p.end;
             }
         }
-        return c;
+        return cnt;
+    }
+}
+
+class pair implements Comparable<pair>{
+    LocalTime start, end;
+
+    pair(LocalTime start, LocalTime end){
+        this.start = start;
+        this.end = end;
+    }
+
+    public  int compareTo(pair p){
+        if(this.end.compareTo(p.end) > 0){
+            return 1;
+        }
+        else{
+            return -1;
+        }
     }
 }
